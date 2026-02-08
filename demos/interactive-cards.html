@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Cards — HTML Stuffs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0a0a0b; --surface: #141416; --border: #2a2a30; --text: #f0ede8; --muted: #8a8690; --accent: #e8ff59; --serif: 'Instrument Serif', serif; --sans: 'DM Sans', sans-serif; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 1.5rem 2rem; color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .back:hover { color: var(--accent); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem; }
+    h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 400; margin-bottom: 0.5rem; }
+    h1 em { color: var(--accent); font-style: italic; }
+    .subtitle { color: var(--muted); font-weight: 300; margin-bottom: 3rem; }
+
+    .cards-showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      perspective: 1000px;
+    }
+
+    .tilt-card {
+      height: 400px;
+      border-radius: 20px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .tilt-card .card-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+    }
+
+    .tilt-card:nth-child(1) .card-bg { background: linear-gradient(160deg, #1a1a2e, #16213e, #0f3460); }
+    .tilt-card:nth-child(2) .card-bg { background: linear-gradient(160deg, #2d1b3d, #1a0b2e, #0d0221); }
+    .tilt-card:nth-child(3) .card-bg { background: linear-gradient(160deg, #1b2d1b, #0b2e1a, #022d0d); }
+
+    .tilt-card .card-shine {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.15) 0%, transparent 60%);
+    }
+
+    .tilt-card:hover .card-shine { opacity: 1; }
+
+    .tilt-card .card-border {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      z-index: 2;
+      pointer-events: none;
+      transition: border-color 0.3s;
+    }
+
+    .tilt-card:hover .card-border { border-color: rgba(255,255,255,0.18); }
+
+    .tilt-card .card-content {
+      position: relative;
+      z-index: 3;
+      height: 100%;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .card-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .tilt-card:nth-child(1) .card-icon { background: rgba(107,197,255,0.15); }
+    .tilt-card:nth-child(2) .card-icon { background: rgba(180,122,255,0.15); }
+    .tilt-card:nth-child(3) .card-icon { background: rgba(107,255,184,0.15); }
+
+    .card-content h3 { font-family: var(--serif); font-size: 1.6rem; font-weight: 400; margin-bottom: 0.5rem; }
+    .card-content p { color: rgba(255,255,255,0.55); font-size: 0.9rem; font-weight: 300; line-height: 1.6; }
+
+    .card-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .card-stat { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+    .card-stat strong { display: block; font-size: 1.1rem; color: var(--text); font-weight: 500; }
+
+    .hint { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 2.5rem; font-weight: 300; }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back">← Back to Collection</a>
+  <div class="container">
+    <h1>Interactive <em>Cards</em></h1>
+    <p class="subtitle">Tilt-responsive 3D cards with parallax depth, spotlight tracking, and smooth hover effects.</p>
+
+    <div class="cards-showcase">
+      <div class="tilt-card">
+        <div class="card-bg"></div>
+        <div class="card-shine"></div>
+        <div class="card-border"></div>
+        <div class="card-content">
+          <div class="card-icon">🚀</div>
+          <h3>Performance</h3>
+          <p>GPU-accelerated transforms with requestAnimationFrame for silky smooth 60fps tilt effects.</p>
+          <div class="card-stats">
+            <div class="card-stat"><strong>60fps</strong>Animation</div>
+            <div class="card-stat"><strong>GPU</strong>Accelerated</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tilt-card">
+        <div class="card-bg"></div>
+        <div class="card-shine"></div>
+        <div class="card-border"></div>
+        <div class="card-content">
+          <div class="card-icon">✨</div>
+          <h3>Spotlight Effect</h3>
+          <p>Dynamic radial gradient follows your cursor to create a realistic light reflection on the card surface.</p>
+          <div class="card-stats">
+            <div class="card-stat"><strong>CSS</strong>Variables</div>
+            <div class="card-stat"><strong>Real-time</strong>Tracking</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tilt-card">
+        <div class="card-bg"></div>
+        <div class="card-shine"></div>
+        <div class="card-border"></div>
+        <div class="card-content">
+          <div class="card-icon">🎯</div>
+          <h3>Depth Layers</h3>
+          <p>Multiple z-layers create a convincing parallax effect. Content floats above the card surface.</p>
+          <div class="card-stats">
+            <div class="card-stat"><strong>3D</strong>Transform</div>
+            <div class="card-stat"><strong>Parallax</strong>Depth</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint">↕ Move your mouse over the cards to see the tilt and spotlight effect</p>
+  </div>
+
+  <script>
+    document.querySelectorAll('.tilt-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / centerY * -12;
+        const rotateY = (x - centerX) / centerX * 12;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        card.querySelector('.card-shine').style.setProperty('--x', `${(x / rect.width) * 100}%`);
+        card.querySelector('.card-shine').style.setProperty('--y', `${(y / rect.height) * 100}%`);
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+        card.style.transition = 'transform 0.5s ease';
+        setTimeout(() => card.style.transition = 'transform 0.1s ease', 500);
+      });
+    });
+  </script>
+</body>
+</html>
