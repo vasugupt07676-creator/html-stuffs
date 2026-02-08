@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starfield Parallax — HTML Stuffs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0a0a0b; --text: #f0ede8; --muted: #8a8690; --accent: #e8ff59; --serif: 'Instrument Serif', serif; --sans: 'DM Sans', sans-serif; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
+
+    .back { position: fixed; top: 0; left: 0; z-index: 100; display: inline-flex; align-items: center; gap: 0.4rem; padding: 1.5rem 2rem; color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .back:hover { color: var(--accent); }
+
+    .starfield {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, #0f0c29 0%, #090714 40%, #020106 100%);
+    }
+
+    .star-layer {
+      position: absolute;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      transition: transform 0.15s ease-out;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+    }
+
+    .star.twinkle { animation: starTwinkle 3s ease-in-out infinite; }
+
+    @keyframes starTwinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    .nebula {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.12;
+    }
+
+    .nebula-1 { width: 500px; height: 400px; background: #667eea; top: 10%; left: 20%; }
+    .nebula-2 { width: 400px; height: 500px; background: #f093fb; top: 50%; right: 15%; }
+    .nebula-3 { width: 300px; height: 300px; background: #4facfe; bottom: 20%; left: 40%; }
+
+    .content {
+      position: relative;
+      z-index: 10;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .content h1 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .content h1 em { color: var(--accent); font-style: italic; }
+
+    .content p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      font-weight: 300;
+      max-width: 450px;
+      margin-top: 1rem;
+    }
+
+    .shooting-star {
+      position: absolute;
+      width: 100px;
+      height: 1px;
+      background: linear-gradient(90deg, white, transparent);
+      opacity: 0;
+      animation: shoot 3s ease-in-out infinite;
+    }
+
+    @keyframes shoot {
+      0% { opacity: 0; transform: translate(0, 0) rotate(-30deg); }
+      5% { opacity: 1; }
+      15% { opacity: 0; transform: translate(300px, 150px) rotate(-30deg); }
+      100% { opacity: 0; }
+    }
+
+    .controls-hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back">← Back to Collection</a>
+
+  <div class="starfield" id="starfield">
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+    <div class="nebula nebula-3"></div>
+    <div class="star-layer" id="layer-far" data-speed="0.01"></div>
+    <div class="star-layer" id="layer-mid" data-speed="0.03"></div>
+    <div class="star-layer" id="layer-near" data-speed="0.06"></div>
+  </div>
+
+  <div class="content">
+    <h1>Into the <em>Void</em></h1>
+    <p>Move your mouse across the screen to explore the parallax starfield with three depth layers.</p>
+  </div>
+
+  <div class="controls-hint">Move your mouse to explore</div>
+
+  <script>
+    const layers = [
+      { el: document.getElementById('layer-far'), speed: 0.01, stars: 200, sizeRange: [0.5, 1.5] },
+      { el: document.getElementById('layer-mid'), speed: 0.03, stars: 120, sizeRange: [1, 2.5] },
+      { el: document.getElementById('layer-near'), speed: 0.06, stars: 60, sizeRange: [1.5, 3.5] },
+    ];
+
+    // Generate stars
+    layers.forEach(layer => {
+      for (let i = 0; i < layer.stars; i++) {
+        const star = document.createElement('div');
+        star.className = 'star' + (Math.random() > 0.7 ? ' twinkle' : '');
+        const size = layer.sizeRange[0] + Math.random() * (layer.sizeRange[1] - layer.sizeRange[0]);
+        star.style.width = star.style.height = size + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.opacity = 0.2 + Math.random() * 0.8;
+        if (star.classList.contains('twinkle')) {
+          star.style.animationDelay = Math.random() * 3 + 's';
+          star.style.animationDuration = (2 + Math.random() * 3) + 's';
+        }
+        // Color variation
+        if (Math.random() > 0.85) {
+          const colors = ['#ffeaa7', '#dfe6e9', '#74b9ff', '#fd79a8'];
+          star.style.background = colors[Math.floor(Math.random() * colors.length)];
+        }
+        layer.el.appendChild(star);
+      }
+    });
+
+    // Add shooting stars
+    function addShootingStar() {
+      const star = document.createElement('div');
+      star.className = 'shooting-star';
+      star.style.top = Math.random() * 50 + '%';
+      star.style.left = Math.random() * 60 + '%';
+      star.style.animationDuration = (2 + Math.random() * 2) + 's';
+      document.getElementById('starfield').appendChild(star);
+      setTimeout(() => star.remove(), 4000);
+    }
+    setInterval(addShootingStar, 4000);
+    setTimeout(addShootingStar, 1000);
+
+    // Parallax on mouse move
+    let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+      targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    function animate() {
+      currentX += (targetX - currentX) * 0.05;
+      currentY += (targetY - currentY) * 0.05;
+
+      layers.forEach(layer => {
+        const x = currentX * layer.speed * window.innerWidth;
+        const y = currentY * layer.speed * window.innerHeight;
+        layer.el.style.transform = `translate(${x}px, ${y}px)`;
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
