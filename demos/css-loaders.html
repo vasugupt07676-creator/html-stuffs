@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Loaders — HTML Stuffs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0a0a0b; --surface: #141416; --border: #2a2a30; --text: #f0ede8; --muted: #8a8690; --accent: #e8ff59; --serif: 'Instrument Serif', serif; --sans: 'DM Sans', sans-serif; --mono: 'JetBrains Mono', monospace; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 1.5rem 2rem; color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .back:hover { color: var(--accent); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem; }
+    h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 400; margin-bottom: 0.5rem; }
+    h1 em { color: var(--accent); font-style: italic; }
+    .subtitle { color: var(--muted); font-weight: 300; margin-bottom: 3rem; }
+
+    .loader-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .loader-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .loader-card:hover {
+      border-color: #3a3a40;
+      transform: translateY(-3px);
+    }
+
+    .loader-display {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .loader-info {
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .loader-name {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+    }
+
+    .loader-tag {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 100px;
+      background: rgba(232,255,89,0.1);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ---- Loader 1: Spinner Ring ---- */
+    .spinner-ring {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(232,255,89,0.15);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* ---- Loader 2: Bouncing Dots ---- */
+    .bounce-dots { display: flex; gap: 8px; }
+    .bounce-dots span {
+      width: 12px; height: 12px;
+      background: #6bc5ff;
+      border-radius: 50%;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+    .bounce-dots span:nth-child(2) { animation-delay: 0.16s; }
+    .bounce-dots span:nth-child(3) { animation-delay: 0.32s; }
+
+    /* ---- Loader 3: Pulse ---- */
+    .pulse {
+      width: 44px; height: 44px;
+      background: #b47aff;
+      border-radius: 50%;
+      animation: pulseGrow 1.2s ease-in-out infinite;
+    }
+
+    /* ---- Loader 4: Bar Wave ---- */
+    .bar-wave { display: flex; gap: 4px; align-items: center; height: 40px; }
+    .bar-wave span {
+      width: 6px;
+      background: #ff6b6b;
+      border-radius: 3px;
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .bar-wave span:nth-child(1) { animation-delay: 0s; height: 20px; }
+    .bar-wave span:nth-child(2) { animation-delay: 0.1s; height: 30px; }
+    .bar-wave span:nth-child(3) { animation-delay: 0.2s; height: 40px; }
+    .bar-wave span:nth-child(4) { animation-delay: 0.3s; height: 30px; }
+    .bar-wave span:nth-child(5) { animation-delay: 0.4s; height: 20px; }
+
+    /* ---- Loader 5: Rotating Squares ---- */
+    .rotating-squares {
+      width: 40px; height: 40px;
+      position: relative;
+    }
+    .rotating-squares::before, .rotating-squares::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 4px;
+    }
+    .rotating-squares::before {
+      background: #6bffb8;
+      top: 0; left: 0;
+      animation: rotSq1 1.8s ease infinite;
+    }
+    .rotating-squares::after {
+      background: #e8ff59;
+      bottom: 0; right: 0;
+      animation: rotSq2 1.8s ease infinite;
+    }
+
+    /* ---- Loader 6: Orbit ---- */
+    .orbit {
+      width: 44px; height: 44px;
+      position: relative;
+    }
+    .orbit::before {
+      content: '';
+      position: absolute;
+      width: 10px; height: 10px;
+      background: #ff6b6b;
+      border-radius: 50%;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      animation: orbit 1s linear infinite;
+      transform-origin: 50% 22px;
+    }
+    .orbit::after {
+      content: '';
+      position: absolute;
+      width: 6px; height: 6px;
+      background: rgba(255,107,107,0.3);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* ---- Loader 7: Morphing Dots ---- */
+    .morph-dots {
+      display: flex; gap: 6px; align-items: center;
+    }
+    .morph-dots span {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      animation: morphDot 2s ease-in-out infinite;
+    }
+    .morph-dots span:nth-child(1) { background: #667eea; animation-delay: 0s; }
+    .morph-dots span:nth-child(2) { background: #764ba2; animation-delay: 0.3s; }
+    .morph-dots span:nth-child(3) { background: #f093fb; animation-delay: 0.6s; }
+
+    /* ---- Loader 8: DNA Helix ---- */
+    .dna { display: flex; gap: 5px; align-items: center; }
+    .dna span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: dna 1.6s ease-in-out infinite;
+    }
+    .dna span:nth-child(1) { animation-delay: 0s; }
+    .dna span:nth-child(2) { animation-delay: 0.15s; }
+    .dna span:nth-child(3) { animation-delay: 0.3s; }
+    .dna span:nth-child(4) { animation-delay: 0.45s; }
+    .dna span:nth-child(5) { animation-delay: 0.6s; }
+
+    /* ---- Loader 9: Gradient Spinner ---- */
+    .gradient-spinner {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: conic-gradient(transparent, #6bc5ff);
+      animation: spin 1s linear infinite;
+      position: relative;
+    }
+    .gradient-spinner::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      background: var(--bg);
+      border-radius: 50%;
+    }
+
+    /* ---- Loader 10: Flip Card ---- */
+    .flip-card {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #fa709a, #fee140);
+      border-radius: 8px;
+      animation: flipCard 1.6s ease infinite;
+    }
+
+    /* ---- Loader 11: Clock ---- */
+    .clock-loader {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(107,255,184,0.2);
+      border-radius: 50%;
+      position: relative;
+    }
+    .clock-loader::after {
+      content: '';
+      position: absolute;
+      width: 2px; height: 14px;
+      background: #6bffb8;
+      top: 50%; left: 50%;
+      transform-origin: bottom center;
+      transform: translate(-50%, -100%);
+      animation: clockHand 2s linear infinite;
+    }
+
+    /* ---- Loader 12: Typing ---- */
+    .typing-loader { display: flex; gap: 5px; align-items: center; }
+    .typing-loader span {
+      width: 8px; height: 8px;
+      background: #b47aff;
+      border-radius: 50%;
+      animation: typingPulse 1.4s ease-in-out infinite;
+    }
+    .typing-loader span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+    /* ---- Keyframes ---- */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+    @keyframes pulseGrow {
+      0%, 100% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.5); }
+      50% { transform: scaleY(1.3); }
+    }
+    @keyframes rotSq1 {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(22px, 0) rotate(90deg); }
+      50% { transform: translate(22px, 22px) rotate(180deg); }
+      75% { transform: translate(0, 22px) rotate(270deg); }
+      100% { transform: translate(0, 0) rotate(360deg); }
+    }
+    @keyframes rotSq2 {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-22px, 0) rotate(-90deg); }
+      50% { transform: translate(-22px, -22px) rotate(-180deg); }
+      75% { transform: translate(0, -22px) rotate(-270deg); }
+      100% { transform: translate(0, 0) rotate(-360deg); }
+    }
+    @keyframes orbit { to { transform: translateX(-50%) rotate(360deg); } }
+    @keyframes morphDot {
+      0%, 100% { transform: scale(1); border-radius: 50%; }
+      25% { transform: scale(1.3); border-radius: 30%; }
+      50% { transform: scale(0.8); border-radius: 50%; }
+      75% { transform: scale(1.1); border-radius: 20%; }
+    }
+    @keyframes dna {
+      0%, 100% { transform: translateY(-8px) scale(0.8); opacity: 0.4; }
+      50% { transform: translateY(8px) scale(1.2); opacity: 1; }
+    }
+    @keyframes flipCard {
+      0% { transform: perspective(200px) rotateX(0) rotateY(0); }
+      25% { transform: perspective(200px) rotateX(180deg) rotateY(0); }
+      50% { transform: perspective(200px) rotateX(180deg) rotateY(180deg); }
+      75% { transform: perspective(200px) rotateX(0) rotateY(180deg); }
+      100% { transform: perspective(200px) rotateX(0) rotateY(0); }
+    }
+    @keyframes clockHand { to { transform: translate(-50%, -100%) rotate(360deg); } }
+    @keyframes typingPulse {
+      0%, 60%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+      30% { transform: translateY(-8px) scale(1.1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back">← Back to Collection</a>
+  <div class="container">
+    <h1>CSS <em>Loaders</em></h1>
+    <p class="subtitle">12 beautiful pure CSS loading animations. Zero JavaScript. Copy the CSS and go.</p>
+
+    <div class="loader-grid">
+      <div class="loader-card">
+        <div class="loader-display"><div class="spinner-ring"></div></div>
+        <div class="loader-info"><span class="loader-name">Spinner Ring</span><span class="loader-tag">border</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="bounce-dots"><span></span><span></span><span></span></div></div>
+        <div class="loader-info"><span class="loader-name">Bouncing Dots</span><span class="loader-tag">scale</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="pulse"></div></div>
+        <div class="loader-info"><span class="loader-name">Pulse</span><span class="loader-tag">scale</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="bar-wave"><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div class="loader-info"><span class="loader-name">Bar Wave</span><span class="loader-tag">transform</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="rotating-squares"></div></div>
+        <div class="loader-info"><span class="loader-name">Rotating Squares</span><span class="loader-tag">pseudo</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="orbit"></div></div>
+        <div class="loader-info"><span class="loader-name">Orbit</span><span class="loader-tag">origin</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="morph-dots"><span></span><span></span><span></span></div></div>
+        <div class="loader-info"><span class="loader-name">Morphing Dots</span><span class="loader-tag">radius</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="dna"><span></span><span></span><span></span><span></span><span></span></div></div>
+        <div class="loader-info"><span class="loader-name">DNA Helix</span><span class="loader-tag">translate</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="gradient-spinner"></div></div>
+        <div class="loader-info"><span class="loader-name">Gradient Spinner</span><span class="loader-tag">conic</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="flip-card"></div></div>
+        <div class="loader-info"><span class="loader-name">Flip Card</span><span class="loader-tag">3D</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="clock-loader"></div></div>
+        <div class="loader-info"><span class="loader-name">Clock</span><span class="loader-tag">pseudo</span></div>
+      </div>
+      <div class="loader-card">
+        <div class="loader-display"><div class="typing-loader"><span></span><span></span><span></span></div></div>
+        <div class="loader-info"><span class="loader-name">Typing</span><span class="loader-tag">bounce</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
