@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morphing Shapes — HTML Stuffs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0a0a0b; --surface: #141416; --border: #2a2a30; --text: #f0ede8; --muted: #8a8690; --accent: #e8ff59; --serif: 'Instrument Serif', serif; --sans: 'DM Sans', sans-serif; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 1.5rem 2rem; color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .back:hover { color: var(--accent); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem; }
+    h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 400; margin-bottom: 0.5rem; }
+    h1 em { color: var(--accent); font-style: italic; }
+    .subtitle { color: var(--muted); font-weight: 300; margin-bottom: 3rem; }
+
+    .shapes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .shape-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .shape-display {
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shape-info {
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .shape-name { font-family: var(--serif); font-size: 1.15rem; }
+    .shape-speed { font-size: 0.7rem; color: var(--muted); padding: 0.2rem 0.6rem; background: var(--bg); border-radius: 100px; }
+
+    /* Blob 1 */
+    .blob-1 {
+      width: 150px; height: 150px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      animation: morph1 8s ease-in-out infinite, rotate1 12s linear infinite;
+    }
+    @keyframes morph1 {
+      0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+      25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+      50% { border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%; }
+      75% { border-radius: 60% 30% 60% 40% / 60% 40% 30% 70%; }
+    }
+    @keyframes rotate1 { to { transform: rotate(360deg); } }
+
+    /* Blob 2 */
+    .blob-2 {
+      width: 140px; height: 140px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      animation: morph2 6s ease-in-out infinite;
+      box-shadow: 0 0 60px rgba(240,147,251,0.2);
+    }
+    @keyframes morph2 {
+      0%, 100% { border-radius: 40% 60% 60% 40% / 60% 40% 40% 60%; }
+      33% { border-radius: 60% 40% 40% 60% / 40% 60% 60% 40%; }
+      66% { border-radius: 50% 50% 40% 60% / 60% 50% 50% 40%; }
+    }
+
+    /* Blob 3 - Layered */
+    .blob-3-container { position: relative; width: 180px; height: 180px; }
+    .blob-3-container > div {
+      position: absolute;
+      inset: 0;
+      animation: morph3 10s ease-in-out infinite;
+    }
+    .blob-3-container > div:nth-child(1) {
+      background: rgba(107,197,255,0.4);
+      animation-delay: 0s;
+    }
+    .blob-3-container > div:nth-child(2) {
+      background: rgba(107,255,184,0.3);
+      animation-delay: -3s;
+      inset: 10px;
+    }
+    .blob-3-container > div:nth-child(3) {
+      background: rgba(232,255,89,0.25);
+      animation-delay: -6s;
+      inset: 20px;
+    }
+    @keyframes morph3 {
+      0%, 100% { border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%; }
+      25% { border-radius: 40% 60% 30% 70% / 60% 30% 70% 40%; }
+      50% { border-radius: 50% 50% 70% 30% / 40% 70% 30% 60%; }
+      75% { border-radius: 30% 70% 40% 60% / 70% 40% 60% 30%; }
+    }
+
+    /* Blob 4 - Gradient shifting */
+    .blob-4 {
+      width: 150px; height: 150px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe, #43e97b, #38f9d7);
+      background-size: 300% 300%;
+      animation: morph4 7s ease-in-out infinite, gradShift 5s ease infinite;
+    }
+    @keyframes morph4 {
+      0%, 100% { border-radius: 40% 60% 70% 30% / 50% 60% 40% 60%; }
+      50% { border-radius: 60% 40% 30% 70% / 60% 40% 60% 40%; }
+    }
+    @keyframes gradShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Blob 5 - Breathing */
+    .blob-5 {
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, #fa709a, #fee140);
+      animation: morph5 4s ease-in-out infinite, breathe 3s ease-in-out infinite;
+    }
+    @keyframes morph5 {
+      0%, 100% { border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%; }
+      50% { border-radius: 40% 60% 60% 40% / 40% 60% 40% 60%; }
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(0.9); }
+      50% { transform: scale(1.15); }
+    }
+
+    /* Blob 6 - Shadow blob */
+    .blob-6 {
+      width: 140px; height: 140px;
+      background: var(--accent);
+      animation: morph6 9s ease-in-out infinite;
+      box-shadow: 0 0 0 0 rgba(232,255,89,0.15);
+      transition: box-shadow 0.3s;
+    }
+    .shape-card:hover .blob-6 {
+      box-shadow: 0 0 80px 20px rgba(232,255,89,0.15);
+    }
+    @keyframes morph6 {
+      0%, 100% { border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%; }
+      33% { border-radius: 45% 55% 60% 40% / 55% 45% 55% 45%; }
+      66% { border-radius: 55% 45% 40% 60% / 45% 55% 45% 55%; }
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back">← Back to Collection</a>
+  <div class="container">
+    <h1>Morphing <em>Shapes</em></h1>
+    <p class="subtitle">Organic blob animations with smooth border-radius morphing. Pure CSS, no libraries.</p>
+
+    <div class="shapes-grid">
+      <div class="shape-card">
+        <div class="shape-display"><div class="blob-1"></div></div>
+        <div class="shape-info"><span class="shape-name">Aurora</span><span class="shape-speed">8s cycle</span></div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-display"><div class="blob-2"></div></div>
+        <div class="shape-info"><span class="shape-name">Rosé</span><span class="shape-speed">6s cycle</span></div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-display">
+          <div class="blob-3-container"><div></div><div></div><div></div></div>
+        </div>
+        <div class="shape-info"><span class="shape-name">Layered</span><span class="shape-speed">10s cycle</span></div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-display"><div class="blob-4"></div></div>
+        <div class="shape-info"><span class="shape-name">Prism</span><span class="shape-speed">7s cycle</span></div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-display"><div class="blob-5"></div></div>
+        <div class="shape-info"><span class="shape-name">Breathe</span><span class="shape-speed">4s cycle</span></div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-display"><div class="blob-6"></div></div>
+        <div class="shape-info"><span class="shape-name">Neon</span><span class="shape-speed">9s cycle</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
