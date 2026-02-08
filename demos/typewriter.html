@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typewriter Effect — HTML Stuffs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0a0a0b; --surface: #141416; --border: #2a2a30; --text: #f0ede8; --muted: #8a8690; --accent: #e8ff59; --serif: 'Instrument Serif', serif; --sans: 'DM Sans', sans-serif; --mono: 'JetBrains Mono', monospace; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 1.5rem 2rem; color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .back:hover { color: var(--accent); }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem; }
+    h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 400; margin-bottom: 0.5rem; }
+    h1 em { color: var(--accent); font-style: italic; }
+    .subtitle { color: var(--muted); font-weight: 300; margin-bottom: 3rem; }
+
+    /* Demo sections */
+    .demo-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .demo-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .demo-title { font-family: var(--serif); font-size: 1.1rem; }
+    .demo-tag { font-size: 0.65rem; padding: 0.2rem 0.6rem; border-radius: 100px; background: rgba(232,255,89,0.1); color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .demo-display {
+      padding: 3rem 2rem;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .tw { font-family: var(--mono); position: relative; display: inline; }
+    .tw .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: currentColor;
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: cursorBlink 0.7s step-end infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Demo 1 - Large heading */
+    .tw-hero { font-size: clamp(1.5rem, 4vw, 2.5rem); color: var(--accent); }
+
+    /* Demo 2 - Multi-line */
+    .tw-multi { font-size: 1rem; color: #6bc5ff; line-height: 1.8; }
+
+    /* Demo 3 - Code */
+    .tw-code { font-size: 0.95rem; color: #6bffb8; }
+    .tw-code .kw { color: #b47aff; }
+    .tw-code .str { color: #f093fb; }
+
+    /* Demo 4 - With prefix */
+    .tw-terminal { font-size: 0.95rem; color: var(--text); }
+    .tw-terminal .prefix { color: #6bffb8; }
+
+    /* Controls */
+    .controls {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+
+    .controls h3 { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 1.5rem; }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .control-row label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .control-row input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .control-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: grab;
+    }
+
+    .control-row input[type="text"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 0.9rem;
+    }
+
+    .try-btn {
+      margin-top: 1rem;
+      padding: 0.7rem 1.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 100px;
+      font-family: var(--sans);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .try-btn:hover { background: #f2ff80; }
+
+    #playground-output {
+      margin-top: 1.5rem;
+      padding: 2rem;
+      background: var(--bg);
+      border-radius: 12px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+    }
+
+    #playground-output .tw { font-size: 1.2rem; color: var(--accent); }
+
+    @media (max-width: 600px) {
+      .control-row { grid-template-columns: 1fr; gap: 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back">← Back to Collection</a>
+  <div class="container">
+    <h1>Typewriter <em>Effect</em></h1>
+    <p class="subtitle">Customizable typewriter text animation with cursor blink, variable speed, and loop support.</p>
+
+    <!-- Demo 1 -->
+    <div class="demo-block">
+      <div class="demo-header"><span class="demo-title">Hero Heading</span><span class="demo-tag">Loop</span></div>
+      <div class="demo-display">
+        <span class="tw tw-hero" data-words='["Hello, World.", "Build something.", "Ship it fast."]' data-speed="80" data-pause="2000" data-loop="true"></span>
+      </div>
+    </div>
+
+    <!-- Demo 2 -->
+    <div class="demo-block">
+      <div class="demo-header"><span class="demo-title">Multi Phrase</span><span class="demo-tag">Queue</span></div>
+      <div class="demo-display">
+        <span class="tw tw-multi" data-words='["The quick brown fox jumps over the lazy dog.", "Pack my box with five dozen liquor jugs.", "How vexingly quick daft zebras jump."]' data-speed="40" data-pause="1500" data-loop="true"></span>
+      </div>
+    </div>
+
+    <!-- Demo 3 -->
+    <div class="demo-block">
+      <div class="demo-header"><span class="demo-title">Code Snippet</span><span class="demo-tag">Mono</span></div>
+      <div class="demo-display">
+        <span class="tw tw-code" data-words='["const greeting = \"Hello!\";", "console.log(greeting);", "// Pure JavaScript magic ✨"]' data-speed="60" data-pause="1800" data-loop="true"></span>
+      </div>
+    </div>
+
+    <!-- Demo 4 -->
+    <div class="demo-block">
+      <div class="demo-header"><span class="demo-title">Terminal</span><span class="demo-tag">Prefix</span></div>
+      <div class="demo-display">
+        <span class="tw tw-terminal"><span class="prefix">~ $&nbsp;</span><span data-words='["npm install html-stuffs", "git commit -m \"feat: add magic\"", "curl https://htmlstuffs.dev"]' data-speed="50" data-pause="2000" data-loop="true"></span></span>
+      </div>
+    </div>
+
+    <!-- Playground -->
+    <div class="controls">
+      <h3>Try It Yourself</h3>
+      <div class="control-row">
+        <label>Text</label>
+        <input type="text" id="tw-text" value="Type your own text here..." placeholder="Enter text...">
+      </div>
+      <div class="control-row">
+        <label>Speed (ms)</label>
+        <input type="range" id="tw-speed" min="20" max="200" value="70">
+      </div>
+      <div class="control-row">
+        <label>Pause (ms)</label>
+        <input type="range" id="tw-pause" min="500" max="4000" value="1500">
+      </div>
+      <button class="try-btn" onclick="runPlayground()">Run Typewriter →</button>
+      <div id="playground-output">
+        <span class="tw" id="playground-tw"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class Typewriter {
+      constructor(el, options = {}) {
+        this.el = el;
+        this.words = options.words || ['Hello'];
+        this.speed = options.speed || 70;
+        this.pause = options.pause || 1500;
+        this.loop = options.loop !== false;
+        this.wordIndex = 0;
+        this.charIndex = 0;
+        this.isDeleting = false;
+
+        // Create cursor
+        this.cursor = document.createElement('span');
+        this.cursor.className = 'cursor';
+        this.el.appendChild(this.cursor);
+
+        this.textNode = document.createTextNode('');
+        this.el.insertBefore(this.textNode, this.cursor);
+
+        this.tick();
+      }
+
+      tick() {
+        const current = this.words[this.wordIndex];
+
+        if (this.isDeleting) {
+          this.charIndex--;
+        } else {
+          this.charIndex++;
+        }
+
+        this.textNode.textContent = current.substring(0, this.charIndex);
+
+        let delay = this.isDeleting ? this.speed / 2 : this.speed;
+
+        if (!this.isDeleting && this.charIndex === current.length) {
+          delay = this.pause;
+          this.isDeleting = true;
+        } else if (this.isDeleting && this.charIndex === 0) {
+          this.isDeleting = false;
+          this.wordIndex = (this.wordIndex + 1) % this.words.length;
+          if (!this.loop && this.wordIndex === 0) return;
+          delay = 300;
+        }
+
+        setTimeout(() => this.tick(), delay);
+      }
+
+      destroy() { this.el.innerHTML = ''; }
+    }
+
+    // Init all typewriters
+    document.querySelectorAll('[data-words]').forEach(el => {
+      const target = el.closest('.tw') || el;
+      new Typewriter(el.hasAttribute('data-words') ? el : target, {
+        words: JSON.parse(el.getAttribute('data-words')),
+        speed: parseInt(el.getAttribute('data-speed') || 70),
+        pause: parseInt(el.getAttribute('data-pause') || 1500),
+        loop: el.getAttribute('data-loop') !== 'false'
+      });
+    });
+
+    let playgroundTw = null;
+    function runPlayground() {
+      const el = document.getElementById('playground-tw');
+      el.innerHTML = '';
+      playgroundTw = new Typewriter(el, {
+        words: [document.getElementById('tw-text').value],
+        speed: parseInt(document.getElementById('tw-speed').value),
+        pause: parseInt(document.getElementById('tw-pause').value),
+        loop: true
+      });
+    }
+  </script>
+</body>
+</html>
