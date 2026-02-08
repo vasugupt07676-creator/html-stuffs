@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glassmorphism Cards — HTML Stuffs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --text: #f0ede8;
+      --muted: #8a8690;
+      --accent: #e8ff59;
+      --serif: 'Instrument Serif', serif;
+      --sans: 'DM Sans', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 1.5rem 2rem; color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .back:hover { color: var(--accent); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem; }
+    h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 400; margin-bottom: 0.5rem; }
+    h1 em { color: var(--accent); font-style: italic; }
+    .subtitle { color: var(--muted); font-weight: 300; margin-bottom: 3rem; }
+
+    .scene {
+      min-height: 70vh;
+      border-radius: 24px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      padding: 3rem;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%);
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      animation: floatOrb 8s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 300px; height: 300px;
+      background: #667eea;
+      top: -50px; left: -50px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 250px; height: 250px;
+      background: #f093fb;
+      bottom: -30px; right: -30px;
+      animation-delay: -3s;
+    }
+
+    .orb-3 {
+      width: 200px; height: 200px;
+      background: #4facfe;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -5s;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(30px, -30px); }
+      50% { transform: translate(-20px, 20px); }
+      75% { transform: translate(20px, 30px); }
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 300px;
+      position: relative;
+      z-index: 1;
+      transition: all 0.4s ease;
+      animation: cardIn 0.6s ease backwards;
+    }
+
+    .glass-card:nth-child(4) { animation-delay: 0.1s; }
+    .glass-card:nth-child(5) { animation-delay: 0.2s; }
+    .glass-card:nth-child(6) { animation-delay: 0.3s; }
+
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    }
+
+    .glass-card .icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .glass-card h3 {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+
+    .glass-card p {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+    }
+
+    .glass-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1.2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 100px;
+      color: white;
+      font-size: 0.8rem;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Code section */
+    .code-section {
+      margin-top: 3rem;
+      background: #141416;
+      border: 1px solid #2a2a30;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #2a2a30;
+    }
+
+    .code-header span {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .code-copy {
+      padding: 0.3rem 0.8rem;
+      background: transparent;
+      border: 1px solid #2a2a30;
+      color: var(--muted);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: var(--sans);
+      transition: all 0.2s;
+    }
+
+    .code-copy:hover { color: var(--accent); border-color: var(--accent); }
+
+    .code-body {
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .code-body pre {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #c4c0b8;
+    }
+
+    .code-body .kw { color: #b47aff; }
+    .code-body .str { color: #6bffb8; }
+    .code-body .num { color: #e8ff59; }
+    .code-body .cmt { color: #555; }
+    .code-body .prop { color: #6bc5ff; }
+
+    @media (max-width: 768px) {
+      .glass-card { width: 100%; }
+      .scene { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back">← Back to Collection</a>
+
+  <div class="container">
+    <h1>Glassmorphism <em>Cards</em></h1>
+    <p class="subtitle">Frosted glass UI with layered transparency, blur effects, and floating orb backgrounds.</p>
+
+    <div class="scene">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+
+      <div class="glass-card">
+        <div class="icon">⚡</div>
+        <h3>Lightning Fast</h3>
+        <p>Pure CSS effects with no JavaScript overhead. Buttery smooth on all devices.</p>
+        <button class="glass-btn">Learn More →</button>
+      </div>
+
+      <div class="glass-card">
+        <div class="icon">🎨</div>
+        <h3>Fully Themeable</h3>
+        <p>Adjust blur, opacity, and border values to match any brand or color scheme.</p>
+        <button class="glass-btn">Customize →</button>
+      </div>
+
+      <div class="glass-card">
+        <div class="icon">📱</div>
+        <h3>Responsive</h3>
+        <p>Graceful degradation for browsers that don't support backdrop-filter.</p>
+        <button class="glass-btn">View Code →</button>
+      </div>
+    </div>
+
+    <div class="code-section">
+      <div class="code-header">
+        <span>CSS</span>
+        <button class="code-copy" onclick="copyCode(this)">Copy</button>
+      </div>
+      <div class="code-body">
+<pre><span class="cmt">/* Glassmorphism Card */</span>
+<span class="kw">.glass-card</span> {
+  <span class="prop">background</span>: <span class="str">rgba(255, 255, 255, 0.07)</span>;
+  <span class="prop">backdrop-filter</span>: <span class="str">blur(20px)</span>;
+  <span class="prop">-webkit-backdrop-filter</span>: <span class="str">blur(20px)</span>;
+  <span class="prop">border</span>: <span class="str">1px solid rgba(255, 255, 255, 0.12)</span>;
+  <span class="prop">border-radius</span>: <span class="num">20px</span>;
+  <span class="prop">padding</span>: <span class="num">2rem</span>;
+}
+
+<span class="kw">.glass-card:hover</span> {
+  <span class="prop">background</span>: <span class="str">rgba(255, 255, 255, 0.12)</span>;
+  <span class="prop">transform</span>: <span class="str">translateY(-8px)</span>;
+  <span class="prop">box-shadow</span>: <span class="str">0 25px 50px rgba(0, 0, 0, 0.3)</span>;
+}
+
+<span class="cmt">/* Background orb for the glow effect */</span>
+<span class="kw">.orb</span> {
+  <span class="prop">position</span>: <span class="str">absolute</span>;
+  <span class="prop">border-radius</span>: <span class="num">50%</span>;
+  <span class="prop">filter</span>: <span class="str">blur(80px)</span>;
+  <span class="prop">opacity</span>: <span class="num">0.5</span>;
+  <span class="prop">background</span>: <span class="str">#667eea</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function copyCode(btn) {
+      const pre = btn.closest('.code-section').querySelector('pre');
+      navigator.clipboard.writeText(pre.textContent);
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    }
+  </script>
+</body>
+</html>
