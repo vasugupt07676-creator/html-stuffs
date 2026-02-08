@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Tooltips — HTML Stuffs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0a0a0b; --surface: #141416; --border: #2a2a30; --text: #f0ede8; --muted: #8a8690; --accent: #e8ff59; --serif: 'Instrument Serif', serif; --sans: 'DM Sans', sans-serif; --mono: 'JetBrains Mono', monospace; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 1.5rem 2rem; color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .back:hover { color: var(--accent); }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem; }
+    h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 400; margin-bottom: 0.5rem; }
+    h1 em { color: var(--accent); font-style: italic; }
+    .subtitle { color: var(--muted); font-weight: 300; margin-bottom: 3rem; }
+
+    .demo-section {
+      margin-bottom: 3rem;
+    }
+
+    .demo-section h2 {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+
+    .demo-section p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .demo-area {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    /* ---- Base Tooltip System ---- */
+    [data-tooltip] {
+      position: relative;
+      cursor: pointer;
+    }
+
+    [data-tooltip]::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 400;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 10;
+      font-family: var(--sans);
+    }
+
+    [data-tooltip]::after {
+      content: '';
+      position: absolute;
+      border: 6px solid transparent;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 10;
+    }
+
+    /* Direction: Top (default) */
+    [data-tooltip]::before {
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+    }
+    [data-tooltip]::after {
+      bottom: calc(100% + -2px);
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    [data-tooltip]:hover::before { opacity: 1; transform: translateX(-50%) translateY(0); }
+    [data-tooltip]:hover::after { opacity: 1; }
+
+    /* Direction: Bottom */
+    [data-tooltip-dir="bottom"]::before {
+      bottom: auto;
+      top: calc(100% + 10px);
+      transform: translateX(-50%) translateY(-8px);
+    }
+    [data-tooltip-dir="bottom"]::after {
+      bottom: auto;
+      top: calc(100% - 2px);
+    }
+    [data-tooltip-dir="bottom"]:hover::before { transform: translateX(-50%) translateY(0); }
+
+    /* Direction: Left */
+    [data-tooltip-dir="left"]::before {
+      bottom: auto;
+      left: auto;
+      right: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%) translateX(8px);
+    }
+    [data-tooltip-dir="left"]::after {
+      bottom: auto;
+      left: auto;
+      right: calc(100% - 2px);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    [data-tooltip-dir="left"]:hover::before { transform: translateY(-50%) translateX(0); }
+
+    /* Direction: Right */
+    [data-tooltip-dir="right"]::before {
+      bottom: auto;
+      left: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%) translateX(-8px);
+    }
+    [data-tooltip-dir="right"]::after {
+      bottom: auto;
+      left: calc(100% - 2px);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    [data-tooltip-dir="right"]:hover::before { transform: translateY(-50%) translateX(0); }
+
+    /* Theme: Light */
+    .tooltip-light[data-tooltip]::before { background: var(--text); color: var(--bg); }
+    .tooltip-light[data-tooltip]::after { border-top-color: var(--text); }
+    .tooltip-light[data-tooltip-dir="bottom"]::after { border-top-color: transparent; border-bottom-color: var(--text); }
+    .tooltip-light[data-tooltip-dir="left"]::after { border-top-color: transparent; border-left-color: var(--text); }
+    .tooltip-light[data-tooltip-dir="right"]::after { border-top-color: transparent; border-right-color: var(--text); }
+
+    /* Theme: Accent */
+    .tooltip-accent[data-tooltip]::before { background: var(--accent); color: var(--bg); font-weight: 500; }
+    .tooltip-accent[data-tooltip]::after { border-top-color: var(--accent); }
+    .tooltip-accent[data-tooltip-dir="bottom"]::after { border-top-color: transparent; border-bottom-color: var(--accent); }
+    .tooltip-accent[data-tooltip-dir="left"]::after { border-top-color: transparent; border-left-color: var(--accent); }
+    .tooltip-accent[data-tooltip-dir="right"]::after { border-top-color: transparent; border-right-color: var(--accent); }
+
+    /* Theme: Glass */
+    .tooltip-glass[data-tooltip]::before { background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); color: white; border: 1px solid rgba(255,255,255,0.15); }
+    .tooltip-glass[data-tooltip]::after { display: none; }
+
+    /* Theme: Coral */
+    .tooltip-coral[data-tooltip]::before { background: #ff6b6b; color: white; }
+    .tooltip-coral[data-tooltip]::after { border-top-color: #ff6b6b; }
+    .tooltip-coral[data-tooltip-dir="bottom"]::after { border-top-color: transparent; border-bottom-color: #ff6b6b; }
+
+    /* Theme: Sky */
+    .tooltip-sky[data-tooltip]::before { background: #6bc5ff; color: #0a0a0b; }
+    .tooltip-sky[data-tooltip]::after { border-top-color: #6bc5ff; }
+
+    /* Trigger Button Style */
+    .trigger {
+      padding: 0.65rem 1.4rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .trigger:hover { border-color: #444; }
+
+    /* Icon triggers */
+    .icon-trigger {
+      width: 44px; height: 44px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .icon-trigger:hover { border-color: #444; background: var(--border); }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back">← Back to Collection</a>
+  <div class="container">
+    <h1>CSS <em>Tooltips</em></h1>
+    <p class="subtitle">Zero-JavaScript tooltip system with four directions, six themes, and bouncy animations. Just add data attributes.</p>
+
+    <div class="demo-section">
+      <h2>Directions</h2>
+      <p>Tooltips can appear in all four directions using the data-tooltip-dir attribute.</p>
+      <div class="demo-area">
+        <button class="trigger tooltip-light" data-tooltip="I'm on top!">Top</button>
+        <button class="trigger tooltip-light" data-tooltip="I'm below!" data-tooltip-dir="bottom">Bottom</button>
+        <button class="trigger tooltip-light" data-tooltip="Left side!" data-tooltip-dir="left">Left</button>
+        <button class="trigger tooltip-light" data-tooltip="Right side!" data-tooltip-dir="right">Right</button>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Themes</h2>
+      <p>Six built-in themes to match any UI. Mix and match freely.</p>
+      <div class="demo-area">
+        <button class="trigger tooltip-light" data-tooltip="Light theme">Light</button>
+        <button class="trigger tooltip-accent" data-tooltip="Accent theme">Accent</button>
+        <button class="trigger tooltip-glass" data-tooltip="Glass theme">Glass</button>
+        <button class="trigger tooltip-coral" data-tooltip="Coral theme">Coral</button>
+        <button class="trigger tooltip-sky" data-tooltip="Sky theme">Sky</button>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Icon Buttons</h2>
+      <p>Works perfectly with icon buttons for compact UI elements.</p>
+      <div class="demo-area">
+        <div class="icon-trigger tooltip-accent" data-tooltip="Home">🏠</div>
+        <div class="icon-trigger tooltip-accent" data-tooltip="Search">🔍</div>
+        <div class="icon-trigger tooltip-accent" data-tooltip="Settings">⚙️</div>
+        <div class="icon-trigger tooltip-accent" data-tooltip="Notifications">🔔</div>
+        <div class="icon-trigger tooltip-accent" data-tooltip="Profile">👤</div>
+        <div class="icon-trigger tooltip-coral" data-tooltip="Delete" data-tooltip-dir="bottom">🗑️</div>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Usage</h2>
+      <div class="demo-area" style="flex-direction: column; align-items: flex-start; font-family: var(--mono); font-size: 0.82rem; color: #b47aff; line-height: 2;">
+        <code>&lt;button <span style="color:#6bc5ff">data-tooltip</span>=<span style="color:#6bffb8">"Hello!"</span>&gt;Hover me&lt;/button&gt;</code>
+        <code>&lt;button <span style="color:#6bc5ff">data-tooltip</span>=<span style="color:#6bffb8">"Below!"</span> <span style="color:#6bc5ff">data-tooltip-dir</span>=<span style="color:#6bffb8">"bottom"</span>&gt;Bottom&lt;/button&gt;</code>
+        <code>&lt;button <span style="color:#6bc5ff">class</span>=<span style="color:#6bffb8">"tooltip-accent"</span> <span style="color:#6bc5ff">data-tooltip</span>=<span style="color:#6bffb8">"Styled!"</span>&gt;Themed&lt;/button&gt;</code>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
