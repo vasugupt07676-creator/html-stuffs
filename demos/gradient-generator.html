@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradient Generator — HTML Stuffs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --surface: #141416;
+      --border: #2a2a30;
+      --text: #f0ede8;
+      --muted: #8a8690;
+      --accent: #e8ff59;
+      --serif: 'Instrument Serif', serif;
+      --sans: 'DM Sans', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+    
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; padding: 1.5rem 2rem; color: var(--muted); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+    .back:hover { color: var(--accent); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem; }
+    
+    h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 400; margin-bottom: 0.5rem; }
+    h1 em { color: var(--accent); font-style: italic; }
+    .subtitle { color: var(--muted); font-weight: 300; margin-bottom: 3rem; font-size: 1.05rem; }
+
+    .app { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; }
+    @media (max-width: 768px) { .app { grid-template-columns: 1fr; } }
+
+    .preview-area {
+      aspect-ratio: 16/10;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+      cursor: crosshair;
+    }
+
+    #gradient-preview {
+      width: 100%; height: 100%;
+      transition: background 0.3s ease;
+    }
+
+    .controls {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .color-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .color-row input[type="color"] {
+      width: 40px; height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      background: none;
+      padding: 2px;
+    }
+
+    .color-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-row input[type="color"]::-webkit-color-swatch { border: none; border-radius: 7px; }
+
+    .color-hex {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      flex: 1;
+    }
+
+    select, .angle-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .angle-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      outline: none;
+    }
+
+    .angle-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: grab;
+    }
+
+    .angle-value {
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .code-output {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      position: relative;
+    }
+
+    .code-output code {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--accent);
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.6rem; right: 0.6rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.3rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      font-family: var(--sans);
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .copy-btn.copied { color: #6bffb8; border-color: #6bffb8; }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+
+    .preset {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .preset:hover { border-color: var(--accent); transform: scale(1.08); }
+
+    .btn-add {
+      width: 100%;
+      padding: 0.6rem;
+      background: transparent;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+    .remove-btn {
+      width: 24px; height: 24px;
+      background: rgba(255,107,107,0.15);
+      color: #ff6b6b;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .remove-btn:hover { background: rgba(255,107,107,0.3); }
+  </style>
+</head>
+<body>
+  <a href="../index.html" class="back">← Back to Collection</a>
+
+  <div class="container">
+    <h1>Gradient <em>Generator</em></h1>
+    <p class="subtitle">Create beautiful CSS gradients with real-time preview and one-click copy.</p>
+
+    <div class="app">
+      <div>
+        <div class="preview-area">
+          <div id="gradient-preview"></div>
+        </div>
+        <div class="code-output" style="margin-top: 1.5rem;">
+          <button class="copy-btn" onclick="copyCSS()">Copy</button>
+          <code id="css-output"></code>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label>Presets</label>
+          <div class="preset-grid" id="presets"></div>
+        </div>
+
+        <div class="control-group">
+          <label>Type</label>
+          <select id="grad-type" onchange="updateGradient()">
+            <option value="linear">Linear</option>
+            <option value="radial">Radial</option>
+            <option value="conic">Conic</option>
+          </select>
+        </div>
+
+        <div class="control-group" id="angle-group">
+          <label>Angle</label>
+          <input type="range" class="angle-slider" id="angle" min="0" max="360" value="135" oninput="updateGradient()">
+          <div class="angle-value"><span id="angle-val">135</span>°</div>
+        </div>
+
+        <div class="control-group">
+          <label>Colors</label>
+          <div class="color-inputs" id="color-inputs"></div>
+          <button class="btn-add" onclick="addColor()" id="add-color-btn">+ Add Color</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const presets = [
+      { colors: ['#667eea', '#764ba2'], angle: 135 },
+      { colors: ['#f093fb', '#f5576c'], angle: 135 },
+      { colors: ['#4facfe', '#00f2fe'], angle: 135 },
+      { colors: ['#43e97b', '#38f9d7'], angle: 135 },
+      { colors: ['#fa709a', '#fee140'], angle: 135 },
+      { colors: ['#a18cd1', '#fbc2eb'], angle: 135 },
+      { colors: ['#ffecd2', '#fcb69f'], angle: 135 },
+      { colors: ['#0c3483', '#a2b6df', '#6b8cce'], angle: 135 },
+    ];
+
+    let colors = ['#667eea', '#764ba2'];
+
+    function renderPresets() {
+      const grid = document.getElementById('presets');
+      grid.innerHTML = presets.map((p, i) => 
+        `<div class="preset" style="background: linear-gradient(135deg, ${p.colors.join(', ')})" onclick="applyPreset(${i})"></div>`
+      ).join('');
+    }
+
+    function applyPreset(i) {
+      colors = [...presets[i].colors];
+      document.getElementById('angle').value = presets[i].angle;
+      renderColorInputs();
+      updateGradient();
+    }
+
+    function renderColorInputs() {
+      const container = document.getElementById('color-inputs');
+      container.innerHTML = colors.map((c, i) => `
+        <div class="color-row">
+          <input type="color" value="${c}" oninput="colors[${i}]=this.value; updateGradient(); this.nextElementSibling.value=this.value;">
+          <input type="text" class="color-hex" value="${c}" oninput="colors[${i}]=this.value; updateGradient(); this.previousElementSibling.value=this.value;">
+          ${colors.length > 2 ? `<button class="remove-btn" onclick="removeColor(${i})">×</button>` : ''}
+        </div>
+      `).join('');
+      document.getElementById('add-color-btn').style.display = colors.length >= 5 ? 'none' : 'block';
+    }
+
+    function addColor() {
+      if (colors.length < 5) {
+        const hue = Math.floor(Math.random() * 360);
+        colors.push(`hsl(${hue}, 70%, 60%)`);
+        renderColorInputs();
+        updateGradient();
+      }
+    }
+
+    function removeColor(i) {
+      colors.splice(i, 1);
+      renderColorInputs();
+      updateGradient();
+    }
+
+    function updateGradient() {
+      const type = document.getElementById('grad-type').value;
+      const angle = document.getElementById('angle').value;
+      document.getElementById('angle-val').textContent = angle;
+
+      const angleGroup = document.getElementById('angle-group');
+      angleGroup.style.display = type === 'radial' ? 'none' : 'block';
+
+      let css;
+      if (type === 'linear') {
+        css = `linear-gradient(${angle}deg, ${colors.join(', ')})`;
+      } else if (type === 'radial') {
+        css = `radial-gradient(circle, ${colors.join(', ')})`;
+      } else {
+        css = `conic-gradient(from ${angle}deg, ${colors.join(', ')})`;
+      }
+
+      document.getElementById('gradient-preview').style.background = css;
+      document.getElementById('css-output').textContent = `background: ${css};`;
+    }
+
+    function copyCSS() {
+      const css = document.getElementById('css-output').textContent;
+      navigator.clipboard.writeText(css);
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    }
+
+    renderPresets();
+    renderColorInputs();
+    updateGradient();
+  </script>
+</body>
+</html>
